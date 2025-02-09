@@ -42,14 +42,19 @@ make
 
 Start the server:
 
+You can specify the server port by providing it as the first argument:
+
 ```bash
-./r-type_server
+./r-type_server [port]
 ```
+If no port is specified, the server will use the default port (8080).
 
 Start a client:
 
+You can specify the server address and optionally the port (default is 8080):
+
 ```bash
-./r-type_client
+./r-type_client <server_address> [port]
 ```
 
 Usage Instructions
