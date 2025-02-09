@@ -1,0 +1,7 @@
+site_name: R-TYPE DOCS
+
+nav:
+  - Home: index.md
+  - Graphic Libraries: lib.md
+  - ECS: ecs.md
+  - Network: protocole.md

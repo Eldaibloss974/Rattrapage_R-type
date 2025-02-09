@@ -1,0 +1,74 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxi-dev libxext-dev libxcursor-dev
+          sudo apt-get install -y build-essential cmake
+          sudo apt-get install -y libglfw3 libglfw3-dev
+          sudo apt-get install -y libboost-all-dev
+
+      - name: Verify dependencies
+        run: |
+          dpkg -s libx11-dev || echo "libx11-dev not installed"
+          dpkg -s libxrandr-dev || echo "libxrandr-dev not installed"
+          dpkg -s libxinerama-dev || echo "libxinerama-dev not installed"
+          dpkg -s libxi-dev || echo "libxi-dev not installed"
+          dpkg -s libxext-dev || echo "libxext-dev not installed"
+          dpkg -s libxcursor-dev || echo "libxcursor-dev not installed"
+          dpkg -s libboost-all-dev || echo "Boost not installed"
+
+      - name: Install Raylib
+        run: |
+          git clone https://github.com/raysan5/raylib.git
+          cd raylib/src
+          make PLATFORM=PLATFORM_DESKTOP
+          sudo make install
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo dockerd > /dev/null 2>&1 &  # Lance Docker en arrière-plan
+        shell: bash
+
+      - name: Verify Docker installation
+        run: |
+          if ! docker --version; then
+            echo "Error: Docker not installed properly."
+            exit 1
+          fi
+
+      - name: Execute run_r-type.sh
+        run: |
+          chmod +x run_r-type.sh
+          sudo ./run_r-type.sh
+
+      - name: Configure with CMake
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+
+      - name: Build with CMake
+        run: |
+          cd build
+          cmake --build . --config Release
